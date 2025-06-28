@@ -1,4 +1,5 @@
 import multiprocessing
+import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -82,8 +83,9 @@ def pycolmap_reconstruction(
     verbose: bool = False,
     options: Optional[Dict[str, Any]] = None,
 ) -> pycolmap.Reconstruction:
-    models_path = sfm_dir / "models"
-    models_path.mkdir(exist_ok=True, parents=True)
+    models_path = os.path.join(sfm_dir, "models")
+    os.makedirs(models_path, exist_ok=True)
+    # models_path.mkdir(exist_ok=True, parents=True)
     logger.info("Running 3D reconstruction...")
     # options = {"ignore_two_view_track": False}
     if options is None:
@@ -171,15 +173,16 @@ def main(
         # shutil.copytree(image_dir, sfm_dir / "images", dirs_exist_ok=True)
 
         # Create reconstruction directory
-        reconstruction_dir = sfm_dir / "reconstruction"
-        reconstruction_dir.mkdir(exist_ok=True, parents=True)
+        reconstruction_dir = os.path.join(sfm_dir, "sparse")
+        os.makedirs(reconstruction_dir, exist_ok=True)
+        # reconstruction_dir.mkdir(exist_ok=True, parents=True)
 
         # Export reconstruction in Colmap format
         model.write(reconstruction_dir)
 
         # Export ply
         if export_ply:
-            model.export_PLY(reconstruction_dir / "rec.ply")
+            model.export_PLY(os.path.join(reconstruction_dir, "rec.ply"))
 
         # Export reconstruction in text format
         if export_text:
